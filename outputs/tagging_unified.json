@@ -1,0 +1,434 @@
+{
+  "run_id": "2025-08-31T17:20:01",
+  "excel": "/mnt/c/Users/sgadal/AppSelector/agentic_tagging_system/TechSpec_Tagging.xlsx",
+  "repo": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js",
+  "items": [
+    {
+      "sheet": "Help",
+      "row_index": 2,
+      "page": "Help",
+      "action": "view",
+      "kpi": "[Help] Page view recorded when Help page loads",
+      "adobe": {
+        "var": "eVar20",
+        "value": "PageView_Help"
+      },
+      "target_terms": [
+        "PageView",
+        "Help"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js",
+        "line": 7,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.216"
+        ]
+      },
+      "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function BillType(){\n   4:   const nav=useNavigate();\n   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">\n  10:       <div className=\"tile big\" onClick={()=>pick('Mobile')}><span>Mobile</span></div>\n  11:       <div className=\"tile big\" onClick={()=>pick('Home Internet')}><span>Home Internet</span></div>\n  12:     </div></div></div>);\n  13: }",
+      "why_location": "The Help page view is relevant to the BillType component as it includes navigation to the Help page.",
+      "suggested_event_name": "Help Page View",
+      "suggested_params": {
+        "eVar20": "PageView_Help",
+        "__pv": true,
+        "pageName": "Help"
+      },
+      "implementation_note": "Track the page view when the Help page is loaded.",
+      "risks": [
+        "Page view may not trigger if navigation is not handled correctly",
+        "Potential for duplicate tracking if not managed"
+      ],
+      "code": {
+        "imports": "import { useEffect } from 'react';",
+        "hook": "useEffect(() => { track('Help Page View', { eVar20: 'PageView_Help', __pv: true, pageName: 'Help' }); }, []);"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "Help",
+      "row_index": 3,
+      "page": "Help",
+      "action": "click",
+      "kpi": "[Help] Utilization of 'Pay your bill' button",
+      "adobe": {
+        "var": "eVar21",
+        "value": "CTA_PayYourBill"
+      },
+      "target_terms": [
+        "Pay your bill"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/Help.js",
+        "line": 9,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.336"
+        ]
+      },
+      "snippet": "   3: export default function Help(){\n   4:   const nav=useNavigate();\n   5:   return(<div className=\"screen\"><div className=\"page\">\n   6:     <div className=\"toolbar\"><div className=\"pill\">Today ▾</div><div className=\"spacer\"/><a className=\"link ghost\" href=\"#\">Español</a><a className=\"link ghost\" href=\"#\">Reviews</a></div>\n   7:     <h1 className=\"hero red\">How can we help you today?</h1>\n   8:     <div className=\"grid-2\">\n   9:       <div className=\"card action\" onClick={()=>nav('/bill-type')}><h3>Pay your bill</h3><p>Make a one-time payment toward your mobile or home internet bill.</p><div className=\"chev\">→</div></div>\n  10:       <div className=\"card\"><h3>Complete your order</h3><p>Access your order to proceed with payment.</p><div className=\"chev\">→</div></div>\n  11:       <div className=\"card\"><h3>Scan &amp; Go</h3><p>Scan the barcode to complete your accessory purchase.</p><div className=\"chev\">→</div></div>\n  12:       <div className=\"card ghost\"><h3>More options</h3><p>Coming soon.</p></div>\n  13:     </div></div></div>);\n  14: }",
+      "why_location": "The click event handler for the 'Pay your bill' button is located in the Help.js file.",
+      "suggested_event_name": "PayYourBill_Click",
+      "suggested_params": {
+        "eVar21": "CTA_PayYourBill",
+        "pageName": "Help"
+      },
+      "implementation_note": "Track the click event on the 'Pay your bill' button to capture user interaction.",
+      "risks": [
+        "Event tracking may not fire if the button is not clicked.",
+        "Potential for duplicate events if not properly managed."
+      ],
+      "code": {
+        "jsx_attrs": "onClick={() => { track('PayYourBill_Click', { eVar21: 'CTA_PayYourBill' }); nav('/bill-type'); }}"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "Help",
+      "row_index": 4,
+      "page": "Help",
+      "action": "nav",
+      "kpi": "[Help] Utilization of 'Español' link",
+      "adobe": {
+        "var": "eVar22",
+        "value": "Nav_Espanol"
+      },
+      "target_terms": [
+        "Español"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/Help.js",
+        "line": 6,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.418"
+        ]
+      },
+      "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function Help(){\n   4:   const nav=useNavigate();\n   5:   return(<div className=\"screen\"><div className=\"page\">\n   6:     <div className=\"toolbar\"><div className=\"pill\">Today ▾</div><div className=\"spacer\"/><a className=\"link ghost\" href=\"#\">Español</a><a className=\"link ghost\" href=\"#\">Reviews</a></div>\n   7:     <h1 className=\"hero red\">How can we help you today?</h1>\n   8:     <div className=\"grid-2\">\n   9:       <div className=\"card action\" onClick={()=>nav('/bill-type')}><h3>Pay your bill</h3><p>Make a one-time payment toward your mobile or home internet bill.</p><div className=\"chev\">→</div></div>\n  10:       <div className=\"card\"><h3>Complete your order</h3><p>Access your order to proceed with payment.</p><div className=\"chev\">→</div></div>\n  11:       <div className=\"card\"><h3>Scan &amp; Go</h3><p>Scan the barcode to complete your accessory purchase.</p><div className=\"chev\">→</div></div>\n  12:       <div className=\"card ghost\"><h3>More options</h3><p>Coming soon.</p></div>",
+      "why_location": "The link for 'Español' is present in the Help page, making it the appropriate location for tracking this navigation event.",
+      "suggested_event_name": "nav",
+      "suggested_params": {
+        "eVar22": "Nav_Espanol",
+        "__pv": true,
+        "pageName": "Help"
+      },
+      "implementation_note": "Track the click event on the 'Español' link to capture navigation to the Spanish version.",
+      "risks": [
+        "Link may not be clicked frequently",
+        "Potential for missing tracking if not implemented correctly"
+      ],
+      "code": {
+        "imports": "import React from 'react';\nimport { useNavigate } from 'react-router-dom';",
+        "jsx_attrs": "onClick={() => track('nav', { eVar22: 'Nav_Espanol', __pv: true, pageName: 'Help' })}",
+        "alt_handler_wrap": "onClick={altHandler => { altHandler(); track('nav', { eVar22: 'Nav_Espanol', __pv: true, pageName: 'Help' }); }}"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "Help",
+      "row_index": 5,
+      "page": "Help",
+      "action": "nav",
+      "kpi": "[Help] Utilization of 'Reviews' link",
+      "adobe": {
+        "var": "eVar23",
+        "value": "Nav_Reviews"
+      },
+      "target_terms": [
+        "Reviews"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/Help.js",
+        "line": 6,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.403"
+        ]
+      },
+      "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function Help(){\n   4:   const nav=useNavigate();\n   5:   return(<div className=\"screen\"><div className=\"page\">\n   6:     <div className=\"toolbar\"><div className=\"pill\">Today ▾</div><div className=\"spacer\"/><a className=\"link ghost\" href=\"#\">Español</a><a className=\"link ghost\" href=\"#\">Reviews</a></div>\n   7:     <h1 className=\"hero red\">How can we help you today?</h1>\n   8:     <div className=\"grid-2\">\n   9:       <div className=\"card action\" onClick={()=>nav('/bill-type')}><h3>Pay your bill</h3><p>Make a one-time payment toward your mobile or home internet bill.</p><div className=\"chev\">→</div></div>\n  10:       <div className=\"card\"><h3>Complete your order</h3><p>Access your order to proceed with payment.</p><div className=\"chev\">→</div></div>\n  11:       <div className=\"card\"><h3>Scan &amp; Go</h3><p>Scan the barcode to complete your accessory purchase.</p><div className=\"chev\">→</div></div>\n  12:       <div className=\"card ghost\"><h3>More options</h3><p>Coming soon.</p></div>",
+      "why_location": "The code contains a clickable JSX element for the 'Reviews' link, making it suitable for tracking navigation events.",
+      "suggested_event_name": "nav",
+      "suggested_params": {
+        "eVar23": "Nav_Reviews",
+        "__pv": false,
+        "pageName": "Help"
+      },
+      "implementation_note": "Track the click event on the 'Reviews' link to capture navigation data.",
+      "risks": [
+        "Link may not be accessible if the href is not properly set",
+        "User may navigate away before tracking is completed"
+      ],
+      "code": {
+        "imports": "import { track } from '../analytics';",
+        "jsx_attrs": "onClick={() => { track('nav', { eVar23: 'Nav_Reviews' }); nav('/reviews'); }}"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "BillType",
+      "row_index": 2,
+      "page": "BillType",
+      "action": "view",
+      "kpi": "[BillType] Page view recorded when BillType page loads",
+      "adobe": {
+        "var": "eVar10",
+        "value": "PageView_BillType"
+      },
+      "target_terms": [
+        "PageView",
+        "BillType"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js",
+        "line": 3,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.433"
+        ]
+      },
+      "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function BillType(){\n   4:   const nav=useNavigate();\n   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">",
+      "why_location": "The page view should be tracked when the BillType component is rendered.",
+      "suggested_event_name": "pageView",
+      "suggested_params": {
+        "__pv": true,
+        "pageName": "PageView_BillType",
+        "eVar10": "PageView_BillType"
+      },
+      "implementation_note": "Add tracking in a useEffect hook to capture the page view on component mount.",
+      "risks": [
+        "Tracking may not fire if component unmounts quickly",
+        "Potential for duplicate tracking if not managed correctly"
+      ],
+      "code": {
+        "imports": "import { useEffect } from 'react';",
+        "hook": "useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_BillType', eVar10: 'PageView_BillType' }); }, []);"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "BillType",
+      "row_index": 3,
+      "page": "BillType",
+      "action": "select",
+      "kpi": "[BillType] Utilization of 'Mobile' option",
+      "adobe": {
+        "var": "eVar11",
+        "value": "Select_BillType_Mobile"
+      },
+      "target_terms": [
+        "Mobile"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js",
+        "line": 10,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.485"
+        ]
+      },
+      "snippet": "   4:   const nav=useNavigate();\n   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">\n  10:       <div className=\"tile big\" onClick={()=>pick('Mobile')}><span>Mobile</span></div>\n  11:       <div className=\"tile big\" onClick={()=>pick('Home Internet')}><span>Home Internet</span></div>\n  12:     </div></div></div>);\n  13: }",
+      "why_location": "The code contains a clickable JSX element for the 'Mobile' option, which is relevant for tracking the selection action.",
+      "suggested_event_name": "select_bill_type",
+      "suggested_params": {
+        "eVar11": "Select_BillType_Mobile",
+        "events": "event1",
+        "__pv": false,
+        "pageName": "BillType"
+      },
+      "implementation_note": "Track the selection of the 'Mobile' bill type option when clicked.",
+      "risks": [
+        "Event may not fire if the click handler is not properly set up.",
+        "Potential for duplicate events if not managed correctly."
+      ],
+      "code": {
+        "jsx_attrs": "onClick={() => { track('select_bill_type', { eVar11: 'Select_BillType_Mobile', events: 'event1' }); pick('Mobile'); }}"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "BillType",
+      "row_index": 4,
+      "page": "BillType",
+      "action": "select",
+      "kpi": "[BillType] Utilization of 'Home Internet' option",
+      "adobe": {
+        "var": "eVar12",
+        "value": "Select_BillType_HomeInternet"
+      },
+      "target_terms": [
+        "Home Internet"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js",
+        "line": 11,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.505"
+        ]
+      },
+      "snippet": "   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">\n  10:       <div className=\"tile big\" onClick={()=>pick('Mobile')}><span>Mobile</span></div>\n  11:       <div className=\"tile big\" onClick={()=>pick('Home Internet')}><span>Home Internet</span></div>\n  12:     </div></div></div>);\n  13: }",
+      "why_location": "The code contains an onClick event for the 'Home Internet' option, making it the appropriate location for tracking this action.",
+      "suggested_event_name": "select_bill_type",
+      "suggested_params": {
+        "eVar12": "Select_BillType_HomeInternet",
+        "pageName": "BillType"
+      },
+      "implementation_note": "Track the selection of the 'Home Internet' bill type option.",
+      "risks": [
+        "Event may not fire if the onClick is not triggered",
+        "Incorrect eVar value if not set properly"
+      ],
+      "code": {
+        "imports": "import { track } from \"@/analytics/track.js\";",
+        "jsx_attrs": "data-analytics-id=\"select_billtype_homeinternet\"\nonClick={(e) => {\n  track(\"select_bill_type\", {\n  \"eVar12\": \"Select_BillType_HomeInternet\",\n  \"pageName\": \"BillType\"\n});\n  /* originalOnClick?.(e); */\n}}",
+        "alt_handler_wrap": "/* If the element uses a named handler like onClick={handleClick}, wrap it: */\nconst _origHandleClick = typeof handleClick === 'function' ? handleClick : null;\nconst handleClickTracked = (e) => {\n  track(\"select_bill_type\", {\n  \"eVar12\": \"Select_BillType_HomeInternet\",\n  \"pageName\": \"BillType\"\n});\n  if (_origHandleClick) return _origHandleClick(e);\n};\n/* then use: onClick={handleClickTracked} */"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "EnterNumber",
+      "row_index": 2,
+      "page": "EnterNumber",
+      "action": "view",
+      "kpi": "[EnterNumber] Page view recorded when EnterNumber page loads",
+      "adobe": {
+        "var": "eVar30",
+        "value": "PageView_EnterNumber"
+      },
+      "target_terms": [
+        "PageView",
+        "EnterNumber"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/EnterNumber.js",
+        "line": 4,
+        "confidence": 0.85,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.493"
+        ]
+      },
+      "snippet": "   1: import React, {useState} from 'react';\n   2: import { useLocation, useNavigate } from 'react-router-dom';\n   3: import Keypad from '../components/Keypad.js';\n   4: export default function EnterNumber(){\n   5:   const nav=useNavigate(); const {state}=useLocation(); const billType=state?.billType||'Mobile';\n   6:   const [value,setValue]=useState(''); const maxLen=billType==='Mobile'?10:12;\n   7:   const onKey=(k)=>{ if(k==='Clear') return setValue(''); if(k==='⌫') return setValue(v=>v.slice(0,-1)); if(/^\\d$/.test(k)) setValue(v=>(v+k).slice(0,maxLen)); };\n   8:   const onSubmit=(e)=>{ e.preventDefault(); if(value.length<Math.min(6,maxLen)) return; alert(`Mock submit for ${billType}: ${value}`); };\n   9:   return(<div className=\"screen\"><div className=\"page\">\n  10:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>",
+      "why_location": "The EnterNumber component is responsible for rendering the EnterNumber page, making it the appropriate location to track page views.",
+      "suggested_event_name": "pageView",
+      "suggested_params": {
+        "__pv": true,
+        "pageName": "PageView_EnterNumber",
+        "eVar30": "PageView_EnterNumber"
+      },
+      "implementation_note": "Add tracking on component mount to capture the page view.",
+      "risks": [
+        "Tracking may not fire if component unmounts unexpectedly",
+        "Ensure track function is correctly implemented"
+      ],
+      "code": {
+        "imports": "import { useEffect } from 'react';",
+        "hook": "useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_EnterNumber', eVar30: 'PageView_EnterNumber' }); }, []);"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "EnterNumber",
+      "row_index": 3,
+      "page": "EnterNumber",
+      "action": "back",
+      "kpi": "[EnterNumber] Utilization of 'Back' button",
+      "adobe": {
+        "var": "eVar31",
+        "value": "Back_EnterNumber"
+      },
+      "target_terms": [
+        "Back"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/EnterNumber.js",
+        "line": 10,
+        "confidence": 0.87,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.534"
+        ]
+      },
+      "snippet": "   4: export default function EnterNumber(){\n   5:   const nav=useNavigate(); const {state}=useLocation(); const billType=state?.billType||'Mobile';\n   6:   const [value,setValue]=useState(''); const maxLen=billType==='Mobile'?10:12;\n   7:   const onKey=(k)=>{ if(k==='Clear') return setValue(''); if(k==='⌫') return setValue(v=>v.slice(0,-1)); if(/^\\d$/.test(k)) setValue(v=>(v+k).slice(0,maxLen)); };\n   8:   const onSubmit=(e)=>{ e.preventDefault(); if(value.length<Math.min(6,maxLen)) return; alert(`Mock submit for ${billType}: ${value}`); };\n   9:   return(<div className=\"screen\"><div className=\"page\">\n  10:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n  11:     <h1 className=\"hero\">Enter your {billType.toLowerCase()} number or account number.</h1>\n  12:     <form className=\"entry\" onSubmit={onSubmit}>\n  13:       <label className=\"field\"><span className=\"label\">{billType} number or account number</span>\n  14:         <input type=\"text\" inputMode=\"numeric\" pattern=\"\\d*\" value={value} onChange={(e)=>setValue(e.target.value.replace(/\\D/g,'').slice(0,maxLen))}/>\n  15:       </label>\n  16:       <Keypad onPress={onKey}/>",
+      "why_location": "The Back button is located in the EnterNumber component, making it the appropriate place to track this action.",
+      "suggested_event_name": "Back Button Clicked",
+      "suggested_params": {
+        "eVar31": "Back_EnterNumber",
+        "__pv": false,
+        "pageName": "EnterNumber"
+      },
+      "implementation_note": "Track the click event on the Back button to capture user navigation behavior.",
+      "risks": [
+        "Event may not fire if button is not clicked",
+        "User may navigate away before tracking occurs"
+      ],
+      "code": {
+        "jsx_attrs": "onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber' }); nav(-1); }}"
+      },
+      "suggested_code_changes": ""
+    },
+    {
+      "sheet": "EnterNumber",
+      "row_index": 4,
+      "page": "EnterNumber",
+      "action": "exit",
+      "kpi": "[EnterNumber] Utilization of 'Exit' link",
+      "adobe": {
+        "var": "eVar32",
+        "value": "Exit_EnterNumber"
+      },
+      "target_terms": [
+        "Exit"
+      ],
+      "top_match": {
+        "file": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/EnterNumber.js",
+        "line": 10,
+        "confidence": 0.87,
+        "evidence": [
+          "nearby event handler",
+          "clickable JSX element",
+          "semantic_sim=0.546"
+        ]
+      },
+      "snippet": "   4: export default function EnterNumber(){\n   5:   const nav=useNavigate(); const {state}=useLocation(); const billType=state?.billType||'Mobile';\n   6:   const [value,setValue]=useState(''); const maxLen=billType==='Mobile'?10:12;\n   7:   const onKey=(k)=>{ if(k==='Clear') return setValue(''); if(k==='⌫') return setValue(v=>v.slice(0,-1)); if(/^\\d$/.test(k)) setValue(v=>(v+k).slice(0,maxLen)); };\n   8:   const onSubmit=(e)=>{ e.preventDefault(); if(value.length<Math.min(6,maxLen)) return; alert(`Mock submit for ${billType}: ${value}`); };\n   9:   return(<div className=\"screen\"><div className=\"page\">\n  10:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n  11:     <h1 className=\"hero\">Enter your {billType.toLowerCase()} number or account number.</h1>\n  12:     <form className=\"entry\" onSubmit={onSubmit}>\n  13:       <label className=\"field\"><span className=\"label\">{billType} number or account number</span>\n  14:         <input type=\"text\" inputMode=\"numeric\" pattern=\"\\d*\" value={value} onChange={(e)=>setValue(e.target.value.replace(/\\D/g,'').slice(0,maxLen))}/>\n  15:       </label>\n  16:       <Keypad onPress={onKey}/>",
+      "why_location": "The exit link is located in the EnterNumber component, making it the appropriate place to track the exit action.",
+      "suggested_event_name": "exit_link_click",
+      "suggested_params": {
+        "eVar32": "Exit_EnterNumber",
+        "events": "event1",
+        "__pv": false,
+        "pageName": "EnterNumber"
+      },
+      "implementation_note": "Track the click event on the Exit button to capture user interaction.",
+      "risks": [
+        "Event may not fire if the button is not clicked",
+        "User may navigate away before the event is tracked"
+      ],
+      "code": {
+        "imports": "import { track } from \"@/analytics/track.js\";",
+        "jsx_attrs": "data-analytics-id=\"exit_enternumber\"\nonClick={(e) => {\n  track(\"exit_link_click\", {\n  \"eVar32\": \"Exit_EnterNumber\",\n  \"events\": \"event1\",\n  \"__pv\": false,\n  \"pageName\": \"EnterNumber\"\n});\n  /* originalOnClick?.(e); */\n}}",
+        "alt_handler_wrap": "/* If the element uses a named handler like onClick={handleClick}, wrap it: */\nconst _origHandleClick = typeof handleClick === 'function' ? handleClick : null;\nconst handleClickTracked = (e) => {\n  track(\"exit_link_click\", {\n  \"eVar32\": \"Exit_EnterNumber\",\n  \"events\": \"event1\",\n  \"__pv\": false,\n  \"pageName\": \"EnterNumber\"\n});\n  if (_origHandleClick) return _origHandleClick(e);\n};\n/* then use: onClick={handleClickTracked} */"
+      },
+      "suggested_code_changes": ""
+    }
+  ],
+  "helper_file": {
+    "path": "src/analytics/track.js",
+    "contents": "// src/analytics/track.js\nexport function track(eventName, params = {}) {\n  const s = window && window.s;\n  if (!s) {\n    // eslint-disable-next-line no-console\n    console.warn('[track] Adobe AppMeasurement `s` not found. Event:', eventName, params);\n    return;\n  }\n  const isPageView = !!params.__pv;\n  const { __pv, events, ...rest } = params;\n  const prevLinkTrackVars = s.linkTrackVars;\n  const prevLinkTrackEvents = s.linkTrackEvents;\n  try {\n    const varNames = [];\n    for (const [k, v] of Object.entries(rest)) {\n      if (/^(eVar|prop)\\d+$/i.test(k)) { s[k] = v; varNames.push(k); }\n      else if (k === 'pageName') { s.pageName = v; varNames.push('pageName'); }\n    }\n    if (isPageView) {\n      if (events) s.events = events; // e.g., 'event10'\n      s.t();               // page view call\n      s.clearVars();       // prevent bleed to next hit\n      return;\n    }\n    // Link tracking (CTA/click)\n    s.linkTrackVars = varNames.concat('events').join(',');\n    if (events) s.linkTrackEvents = events;\n    s.events = events || '';\n    s.tl(true, 'o', eventName);  // 'o' = custom link, name = eventName\n  } catch (e) {\n    // eslint-disable-next-line no-console\n    console.error('track error', e);\n  } finally {\n    s.linkTrackVars = prevLinkTrackVars;\n    s.linkTrackEvents = prevLinkTrackEvents;\n  }\n}\n"
+  }
+}
