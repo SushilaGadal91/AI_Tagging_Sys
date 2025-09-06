@@ -54,8 +54,8 @@ def main():
 
     # Resolve inputs
     excel_candidates = [
-        os.getenv("TECHSPEC_PATH"),
-        "TechSpec_Tagging.xlsx",
+        os.getenv("TECHSPEC_PATH")
+        # "TechSpec_Tagging.xlsx",
         # "techspec.xlsx",
     ]
     excel = next((p for p in excel_candidates if p and Path(p).exists()), None)
@@ -66,7 +66,7 @@ def main():
                 print(f"  - {c}")
         sys.exit(1)
 
-    repo = os.getenv("REPO_PATH", "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js")
+    repo = os.getenv("REPO_PATH")
     if not Path(repo).exists():
         print(f"✗ React repo not found at: {repo}")
         sys.exit(1)

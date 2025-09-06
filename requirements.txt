@@ -7,3 +7,5 @@ pillow==10.2.0
 python-dotenv==1.0.0
 tiktoken==0.5.2
 openai>=1.40
+playwright==1.46.0
+requests==2.32.3

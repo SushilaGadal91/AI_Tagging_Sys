@@ -1,0 +1,26 @@
+{
+  "naming": {
+    "selection": "Select_{object}",
+    "continue": "Continue_{object}",
+    "skip": "Skip_{object}",
+    "generic": "{action}_{object}"
+  },
+  "dictionary": {
+    "bill": "Bill",
+    "mobile": "Mobile",
+    "home internet": "HomeInternet",
+    "account entry": "AccountEntry",
+    "identifier": "Identifier",
+    "pay bill": "PayBill",
+    "category": "Category"
+  },
+  "action_aliases": {
+    "select": "selection",
+    "choose": "selection",
+    "tap continue": "continue",
+    "press continue": "continue",
+    "skip": "skip"
+  },
+  "value_joiner": "_",
+  "variable": "eVar27"
+}
