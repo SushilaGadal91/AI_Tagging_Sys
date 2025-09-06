@@ -1,4 +1,4 @@
-# tools/ai_repo_applier.py
+# tools/ai_repo_applier.py (JSON-driven)
 from __future__ import annotations
 
 import os
@@ -14,21 +14,7 @@ try:
 except Exception:
     raise RuntimeError("tools.openai_utils.get_client not found. Make sure your project structure matches.")
 
-# ----------------- Markdown parsing (dynamic & robust) -----------------
-
-MD_LOC_RE = re.compile(
-    r"-\s+\*\*Suggested Location\*\*:\s*`(?P<file>[^`]+?):(?P<line>\d+)`",
-    re.IGNORECASE,
-)
-MD_ACTION_RE = re.compile(r"-\s+\*\*Action\*\*:\s*`(?P<action>[^`]+)`", re.IGNORECASE)
-MD_EVENT_RE  = re.compile(r"-\s+\*\*Event\*\*:\s*`(?P<event>[^`]+)`", re.IGNORECASE)
-MD_PARAMS_START_RE = re.compile(r"-\s+\*\*Params:\*\*\s*$", re.IGNORECASE)
-
-H3_KPI_RE = re.compile(r"^\s*###\s+KPI:", re.IGNORECASE)
-H2_PAGE_RE = re.compile(r"^\s*##\s+Page:", re.IGNORECASE)
-
-# Any italic underscore title like "_Hook:_", "_JSX attributes:_", "_My Custom Patch:_"
-TITLE_ANY_RE = re.compile(r"^_+\s*(?P<title>[^:]+):_?\s*$", re.IGNORECASE)
+# ----------------- Utilities -----------------
 
 def _read_text(p: Path) -> str:
     return p.read_text(encoding="utf-8")
@@ -37,142 +23,43 @@ def _write_text(p: Path, text: str):
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text, encoding="utf-8", newline="")
 
-def _find_fenced_block(lines: List[str], start_idx: int) -> Tuple[str, int, str]:
-    """
-    Return (code, next_index, lang) for a fenced block starting at or after start_idx.
-    Supports ``` and language fences like ```jsx.
-    Returns ("", idx, "") if not found.
-    """
-    i = start_idx
-    while i < len(lines):
-        ls = lines[i].lstrip()
-        if ls.startswith("```"):
-            fence = "```"
-            lang = ls[3:].strip().lower()
-            i += 1
-            buf: List[str] = []
-            while i < len(lines) and not lines[i].strip().startswith(fence):
-                buf.append(lines[i].rstrip("\n"))
-                i += 1
-            return ("\n".join(buf).rstrip(), min(i + 1, len(lines)), lang)
-        i += 1
-    return ("", start_idx, "")
+def to_posix(p: str) -> str:
+    if not p:
+        return p
+    p2 = p.replace("\\", "/")
+    m = re.match(r"^([A-Za-z]):/(.*)$", p2)
+    if m:
+        return f"/mnt/{m.group(1).lower()}/{m.group(2)}"
+    return p2
 
-def _slug(s: str) -> str:
-    s = (s or "").lower()
-    s = re.sub(r"[^a-z0-9]+", "_", s)
-    return re.sub(r"_+", "_", s).strip("_")
+# ----------------- Fuzzy anchor via snippet -----------------
 
-def _canonical_key(slug: str) -> str:
-    if "import" in slug:
-        return "imports"
-    if "hook" in slug or "effect" in slug:
-        return "hook"
-    if "jsx" in slug or "attr" in slug:
-        return "jsx_attrs"
-    if "wrap" in slug or "handler" in slug:
-        return "alt_handler_wrap"
-    return slug  # dynamic passthrough
+def _clean_numbered_snippet(snippet: str) -> str:
+    lines = []
+    for ln in (snippet or "").splitlines():
+        # strip leading '  10: ' style prefixes
+        lines.append(re.sub(r"^\s*\d+:\s?", "", ln))
+    return "\n".join(lines).strip()
 
-def parse_md_plan(md_path: Path) -> List[Dict[str, Any]]:
-    """
-    Parse tagging_unified.md -> list of items:
-    { file, line, action, event, params, snippet, code:{... arbitrary keys ...} }
-    Only items with a Suggested Location are included.
-    """
-    text = _read_text(md_path)
-    lines = text.splitlines()
-    items: List[Dict[str, Any]] = []
-
-    i = 0
-    while i < len(lines):
-        if H3_KPI_RE.match(lines[i] or ""):
-            rec: Dict[str, Any] = {"code": {}}
-            pending_snippet: Optional[str] = None
-            j = i + 1
-            while j < len(lines) and not H3_KPI_RE.match(lines[j] or ""):
-                if H2_PAGE_RE.match(lines[j] or "") and rec.get("file"):
-                    break
-
-                m = MD_ACTION_RE.search(lines[j]);      rec["action"] = (m.group("action").strip().lower() if m else rec.get("action"))
-                m = MD_LOC_RE.search(lines[j])
-                if m:
-                    rec["file"] = m.group("file").strip()
-                    try:
-                        rec["line"] = int(m.group("line"))
-                    except Exception:
-                        rec["line"] = 1
-                m = MD_EVENT_RE.search(lines[j]);       rec["event"] = (m.group("event").strip() if m else rec.get("event"))
-
-                # Params block
-                if MD_PARAMS_START_RE.match(lines[j] or ""):
-                    code, j2, _ = _find_fenced_block(lines, j + 1)
-                    try:
-                        rec["params"] = json.loads(code) if code else {}
-                    except Exception:
-                        rec["params"] = {}
-                    j = j2
-                    continue
-
-                # Snippet block (the code window from the repo)
-                if lines[j].strip().startswith("```"):
-                    code, j2, lang = _find_fenced_block(lines, j)
-                    # keep the last JSX/TSX/JS snippet seen before "Suggested code to add" as the anchor snippet
-                    if lang in {"jsx", "tsx", "js"} and code:
-                        pending_snippet = code
-                    j = j2
-                    continue
-
-                # Dynamic capture of any italic section under "Suggested code to add"
-                if lines[j].strip().lower().startswith("**suggested code to add:**"):
-                    if pending_snippet:
-                        rec["snippet"] = pending_snippet
-                    k = j + 1
-                    while k < len(lines) and not (H3_KPI_RE.match(lines[k] or "") or H2_PAGE_RE.match(lines[k] or "")):
-                        mtitle = TITLE_ANY_RE.match(lines[k].strip())
-                        if mtitle:
-                            slug = _slug(mtitle.group("title"))
-                            key = _canonical_key(slug)
-                            code, k, _ = _find_fenced_block(lines, k + 1)
-                            rec["code"][key] = code
-                            continue
-                        k += 1
-                    j = k
-                    continue
-                j += 1
-
-            if rec.get("file"):
-                items.append(rec)
-            i = j
-            continue
-        i += 1
-
-    return items
-
-# ----------------- Utilities: fuzzy anchor via snippet -----------------
 
 def _best_anchor_from_snippet(file_text: str, snippet: str) -> Optional[int]:
-    """
-    Fuzzy-locate the snippet in file_text and return a 1-based anchor line
-    (middle of the matched block). Returns None if not found.
-    """
+    """Fuzzy-locate the snippet in file_text and return a 1-based anchor line (middle of block)."""
     file_lines = file_text.splitlines()
-    snip_lines = [ln for ln in snippet.splitlines() if ln.strip()]
+    snip = _clean_numbered_snippet(snippet)
+    snip_lines = [ln for ln in snip.splitlines() if ln.strip()]
     if not snip_lines or not file_lines:
         return None
 
-    # Create a sliding window and pick the highest ratio match
     best_score = 0.0
     best_start = None
-    window = min(len(file_lines), max(5, len(snip_lines)))
     for start in range(0, len(file_lines) - len(snip_lines) + 1):
-        chunk = "\n".join(file_lines[start:start+len(snip_lines)])
+        chunk = "\n".join(file_lines[start:start + len(snip_lines)])
         score = difflib.SequenceMatcher(None, chunk, "\n".join(snip_lines)).ratio()
         if score > best_score:
             best_score = score
             best_start = start
 
-    if best_start is not None and best_score >= 0.6:  # threshold
+    if best_start is not None and best_score >= 0.6:
         mid = best_start + (len(snip_lines) // 2)
         return max(1, min(len(file_lines), mid + 1))
     return None
@@ -186,6 +73,7 @@ def _extract_json(text: str) -> Dict[str, Any]:
         return json.loads(text)
     except Exception:
         pass
+    # fenced
     start = text.find("```")
     if start != -1:
         end = text.find("```", start + 3)
@@ -197,7 +85,7 @@ def _extract_json(text: str) -> Dict[str, Any]:
                 return json.loads(body.strip())
             except Exception:
                 pass
-    # brace counting
+    # brace scan
     s = text; n = len(s); i = 0
     while i < n:
         if s[i] == "{":
@@ -215,10 +103,10 @@ def _extract_json(text: str) -> Dict[str, Any]:
         i += 1
     return {}
 
-# ----------------- Dynamic, TechSpec-driven prompt -----------------
+# ----------------- Prompt config -----------------
 
 CONFIG = {
-    "language": "js",  # keep JS only
+    "language": "js",
     "analytics_vendor": "adobe",
     "helper_import": "import { track } from '../analytics/track.js';",
 }
@@ -229,7 +117,7 @@ DYNAMIC_SYSTEM = (
     " • Full text of a React **JavaScript** file (no TypeScript).\n"
     " • An anchor **line number** and a code **snippet** from the file near where tagging should be applied.\n"
     " • A tagging instruction for **Adobe Analytics** using a helper `track(eventName, params)`.\n"
-    " • A dict of **code sections** extracted from a Tech Spec/MD (arbitrary keys).\n"
+    " • A dict of **code sections** provided directly from a JSON spec (arbitrary keys).\n"
     "\n"
     "Rules (must follow):\n"
     " 1) JavaScript only. Preserve imports/eslint/comments/formatting as much as practical.\n"
@@ -242,11 +130,13 @@ DYNAMIC_SYSTEM = (
     "    • Keys containing 'wrap'/'handler' → wrap or replace existing handler while preserving original behavior.\n"
     "    • Any **other** keys are treated as **patch snippets**: insert the snippet in a minimal, sensible location near the anchor.\n"
     " 5) If there is an existing handler (e.g., `onClick={handle}`), inject `track(...)` at the start and keep original logic.\n"
-    " 6) Ensure **imports** are added once: {helper_import}\n"
+    " 6) Ensure a single import exists: {helper_import} (prefer named import).\n"
     " 7) Do **not** invent code if a section is missing; only apply what is provided.\n"
     " 8) Output ONLY strict JSON: "
     "{ \"applied\": true|false, \"reason\": \"...\", \"updated_file\": \"<full text>\" }"
 )
+
+# ----------------- Message building -----------------
 
 def _lines_context(file_text: str, line: int, radius: int = 40) -> str:
     lines = file_text.splitlines()
@@ -256,6 +146,14 @@ def _lines_context(file_text: str, line: int, radius: int = 40) -> str:
     i1 = min(len(lines), line + radius)
     chunk = lines[i0-1:i1]
     return "\n".join(f"{i0+idx:>5}: {ln}" for idx, ln in enumerate(chunk))
+
+
+def _normalize_import_line(s: str) -> str:
+    s = s.strip()
+    # convert default import to named import (matches helper export)
+    s = re.sub(r"^import\s+track\s+from\s+", "import { track } from ", s)
+    return s
+
 
 def _build_messages(
     file_text: str,
@@ -267,30 +165,43 @@ def _build_messages(
     snippet: Optional[str],
 ) -> List[Dict[str, str]]:
     system = DYNAMIC_SYSTEM.replace("{helper_import}", CONFIG["helper_import"])
+
+    # normalize imports inside code sections (JSON might contain default import style)
+    code_sections = {}
+    for k, v in (code or {}).items():
+        if isinstance(v, str) and v.strip():
+            if "import" in k.lower():
+                code_sections[k] = _normalize_import_line(v)
+            else:
+                code_sections[k] = v
+
     instr = {
         "action": action,
         "event": event,
         "params": params,
         "anchor_line": anchor_line,
-        "snippet": snippet or "",
-        "code_sections": {k: v for k, v in (code or {}).items() if isinstance(v, str) and v.strip()},
+        "snippet": _clean_numbered_snippet(snippet or ""),
+        "code_sections": code_sections,
         "around_anchor": _lines_context(file_text, anchor_line, radius=40),
         "vendor": CONFIG["analytics_vendor"],
         "language": CONFIG["language"],
         "notes": [
-            "Apply only what is provided; do not synthesize missing sections.",
+            "Use named import for track.",
             "If both attrs and a handler patch exist, prefer attrs merge and inject track(...) in handler.",
             "Keep JSX valid; do not convert to TypeScript.",
         ],
     }
+
     user = (
-        "FILE:\n<<FILE_START>>\n" + file_text + "\n<<FILE_END>>\n\n"
+        "FILE:\n<<FILE_START>>\n" + file_text + "\n<<FILE_END>>\n\n" +
         "INSTRUCTION:\n" + json.dumps(instr, ensure_ascii=False)
     )
     return [
         {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
+
+# ----------------- LLM edit -----------------
 
 def _ai_edit_file(
     client,
@@ -324,34 +235,70 @@ def _ai_edit_file(
     except Exception as e:
         return {"applied": False, "reason": f"LLM error: {e}", "updated_file": file_text}
 
+# ----------------- JSON parsing -----------------
+
+def parse_json_plan(json_path: Path) -> Dict[str, Any]:
+    if not json_path.exists():
+        raise FileNotFoundError(f"JSON not found: {json_path}")
+    with open(json_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
 # ----------------- Public API -----------------
 
-def ai_apply_from_md(
-    md_path: str | Path,
+def ai_apply_from_json(
+    json_path: str | Path,
     repo_root: str | Path,
     model: str = "gpt-4o-mini",
     dry_run: bool = False,
 ) -> Tuple[int, int]:
     """
-    Read the Markdown plan, ask the LLM to perform the edits, and write files.
+    Read the JSON spec (items[*]) and ask the LLM to perform the edits.
     Returns (ok_count, fail_count). Creates .taggingai.bak backups.
     """
     client = get_client()
-    md = Path(md_path).resolve()
-    repo = Path(repo_root).resolve()
+    js = Path(json_path).resolve()
+    repo = Path(to_posix(str(repo_root))).resolve()
 
-    items = parse_md_plan(md)
+    data = parse_json_plan(js)
+    items = data.get("items") or data.get("suggestions") or []
     if not items:
-        print(f"✗ No actionable items found in {md}")
+        print(f"✗ No actionable items found in {js}")
         return (0, 0)
 
-    # log file to understand not-applied cases
-    logs: List[Dict[str, Any]] = []
+    # optional helper file creation
+    helper = data.get("helper_file") or {}
+    try:
+        helper_path = helper.get("path")
+        helper_contents = helper.get("contents")
+        if helper_path and helper_contents is not None:
+            hp = (repo / helper_path).resolve()
+            hp.parent.mkdir(parents=True, exist_ok=True)
+            if not hp.exists() or _read_text(hp) != helper_contents:
+                _write_text(hp, helper_contents)
+                print(f"🧩 Helper file updated: {hp}")
+            else:
+                print(f"🧩 Helper file already up-to-date: {hp}")
+    except Exception as e:
+        print(f"⚠️  Helper file update skipped: {e}")
 
+    logs: List[Dict[str, Any]] = []
     ok = fail = 0
+
     for it in items:
-        rel = it["file"]
-        target = Path(rel)
+        # Resolve target file
+        file_hint = (
+            (it.get("top_match") or {}).get("file")
+            or it.get("file")
+            or it.get("file_path")
+        )
+        if not file_hint:
+            msg = "Missing file path in item"
+            print(f"✗ {msg}")
+            logs.append({**it, "result": {"applied": False, "reason": msg}})
+            fail += 1
+            continue
+
+        target = Path(to_posix(file_hint))
         if not target.is_absolute():
             target = (repo / target).resolve()
 
@@ -371,45 +318,43 @@ def ai_apply_from_md(
             fail += 1
             continue
 
+        # Gather instruction fields
         action  = (it.get("action") or "").lower().strip()
-        event   = (it.get("event") or "custom_event").strip()
-        params  = it.get("params") or {}
+        event   = (it.get("suggested_event_name") or it.get("event") or "custom_event").strip()
+        params  = it.get("suggested_params") or it.get("params") or {}
         code    = it.get("code") or {}
-        snippet = it.get("snippet")
+        snippet = it.get("snippet")  # may include numbered lines
 
-        # Better anchor via snippet (if available)
-        anchor = int(it.get("line") or 1)
+        # anchor: use provided top_match.line else fuzzy from snippet
+        anchor = int((it.get("top_match") or {}).get("line") or 1)
         better = _best_anchor_from_snippet(src, snippet) if snippet else None
         if better:
             anchor = better
 
-        # First attempt
+        # 1st attempt
         result1 = _ai_edit_file(client, model, src, action, event, params, anchor, code, snippet)
         new_src = result1.get("updated_file") or src
         applied = bool(result1.get("applied"))
         reason  = (result1.get("reason") or "").strip() or ("ok" if applied else "no changes")
 
-        # Retry once with larger context if not applied and unchanged
+        # Retry once with shifted anchor if unchanged
         if not applied and new_src == src:
-            # Expand context by tweaking the anchor a bit (±20 lines)
             alt_anchor = max(1, min(len(src.splitlines()), anchor + 20))
             result2 = _ai_edit_file(client, model, src, action, event, params, alt_anchor, code, snippet)
             new_src2 = result2.get("updated_file") or src
             applied2 = bool(result2.get("applied"))
             reason2  = (result2.get("reason") or "").strip() or ("ok" if applied2 else "no changes")
-
             if applied2 and new_src2 != src:
                 applied = True
                 new_src = new_src2
                 reason = f"retry_ok: {reason2}"
-                result1 = result2
             else:
                 reason = f"not_applied: {reason}; retry: {reason2}"
 
         if not applied and new_src == src:
             print(f"• {target}: {reason}")
             logs.append({**it, "result": {"applied": False, "reason": reason}})
-            ok += 1  # idempotent/no-change treated as OK to keep pipeline moving
+            ok += 1  # treat idempotent/no-op as OK
             continue
 
         if dry_run:
@@ -432,9 +377,9 @@ def ai_apply_from_md(
             logs.append({**it, "result": {"applied": False, "reason": msg}})
             fail += 1
 
-    # persist logs next to the md
+    # persist logs next to the JSON
     try:
-        out_log = md.parent / "apply_log.json"
+        out_log = js.parent / "apply_log.json"
         _write_text(out_log, json.dumps(logs, indent=2, ensure_ascii=False))
     except Exception:
         pass
@@ -448,12 +393,12 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
 
-    ap = argparse.ArgumentParser(description="AI-applier: modify repo files based on tagging_unified.md")
-    ap.add_argument("--md", default="outputs/tagging_unified.md")
+    ap = argparse.ArgumentParser(description="AI-applier: modify repo files based on tagging_unified.json")
+    ap.add_argument("--json", default="outputs/tagging_unified.json")
     ap.add_argument("--repo", default=os.environ.get("REPO_PATH", "."))
     ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"))
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    ok, fail = ai_apply_from_md(args.md, args.repo, model=args.model, dry_run=args.dry_run)
+    ok, fail = ai_apply_from_json(args.json, args.repo, model=args.model, dry_run=args.dry_run)
     print(f"\nResult: {ok} items processed, {fail} failed.")

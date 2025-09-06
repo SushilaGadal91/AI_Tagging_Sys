@@ -9,7 +9,7 @@
 - **Action**: `view`
 - **Adobe**: var=`eVar10`, value=`PageView_BillType`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js:3`  (confidence 0.85)
-- **Why here**: The page view should be tracked when the BillType component is rendered.
+- **Why here**: The BillType component is responsible for rendering the BillType page, making it the appropriate location to track page views.
 - **Event**: `pageView`
 - **Params:**
 ```json
@@ -19,8 +19,8 @@
   "eVar10": "PageView_BillType"
 }
 ```
-- **Implementation**: Add tracking in a useEffect hook to capture the page view on component mount.
-- **Risks**: Tracking may not fire if component unmounts quickly, Potential for duplicate tracking if not managed correctly
+- **Implementation**: Ensure that the track function is called when the component mounts to capture the page view.
+- **Risks**: Potential for duplicate tracking if not managed correctly, May not capture if the component is not mounted properly
 
 ```jsx
    1: import React from 'react';
@@ -49,8 +49,8 @@ useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_BillType',
 - **Action**: `select`
 - **Adobe**: var=`eVar12`, value=`Select_BillType_HomeInternet`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js:11`  (confidence 0.85)
-- **Why here**: The code contains an onClick event for the 'Home Internet' option, making it the appropriate location for tracking this action.
-- **Event**: `select_bill_type`
+- **Why here**: The event handler for selecting the 'Home Internet' option is located in the BillType component.
+- **Event**: `selectBillType`
 - **Params:**
 ```json
 {
@@ -58,8 +58,8 @@ useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_BillType',
   "pageName": "BillType"
 }
 ```
-- **Implementation**: Track the selection of the 'Home Internet' bill type option.
-- **Risks**: Event may not fire if the onClick is not triggered, Incorrect eVar value if not set properly
+- **Implementation**: Track the selection of the 'Home Internet' option when the corresponding tile is clicked.
+- **Risks**: Event may not fire if the click handler is not correctly implemented., Potential for duplicate events if not properly managed.
 
 ```jsx
    5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});
@@ -77,7 +77,7 @@ useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_BillType',
 
 _Imports (add once per file if missing):_
 ```js
-import { track } from "@/analytics/track.js";
+import { track } from "../analytics/track.js";
 ```
 
 _JSX attributes (apply to the element):_
@@ -85,7 +85,7 @@ _JSX attributes (apply to the element):_
 <YourElement
 data-analytics-id="select_billtype_homeinternet"
 onClick={(e) => {
-  track("select_bill_type", {
+  track("selectBillType", {
   "eVar12": "Select_BillType_HomeInternet",
   "pageName": "BillType"
 });
@@ -101,7 +101,7 @@ _Alternative wrapper (if preserving existing handler):_
 /* If the element uses a named handler like onClick={handleClick}, wrap it: */
 const _origHandleClick = typeof handleClick === 'function' ? handleClick : null;
 const handleClickTracked = (e) => {
-  track("select_bill_type", {
+  track("selectBillType", {
   "eVar12": "Select_BillType_HomeInternet",
   "pageName": "BillType"
 });
@@ -113,7 +113,7 @@ const handleClickTracked = (e) => {
 - **Action**: `select`
 - **Adobe**: var=`eVar11`, value=`Select_BillType_Mobile`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js:10`  (confidence 0.85)
-- **Why here**: The code contains a clickable JSX element for the 'Mobile' option, which is relevant for tracking the selection action.
+- **Why here**: The code contains a clickable JSX element for the 'Mobile' option, making it suitable for tracking the selection action.
 - **Event**: `select_bill_type`
 - **Params:**
 ```json
@@ -124,8 +124,8 @@ const handleClickTracked = (e) => {
   "pageName": "BillType"
 }
 ```
-- **Implementation**: Track the selection of the 'Mobile' bill type option when clicked.
-- **Risks**: Event may not fire if the click handler is not properly set up., Potential for duplicate events if not managed correctly.
+- **Implementation**: Track the selection of the 'Mobile' bill type option.
+- **Risks**: Event may not fire if navigation fails, User may not click the option
 
 ```jsx
    4:   const nav=useNavigate();
@@ -142,20 +142,50 @@ const handleClickTracked = (e) => {
 
 **Suggested code to add:**
 
+_Imports (add once per file if missing):_
+```js
+import { track } from "../analytics/track.js";
+```
+
 _JSX attributes (apply to the element):_
 ```jsx
 <YourElement
-onClick={() => { track('select_bill_type', { eVar11: 'Select_BillType_Mobile', events: 'event1' }); pick('Mobile'); }}
+data-analytics-id="select_billtype_mobile"
+onClick={(e) => {
+  track("select_bill_type", {
+  "eVar11": "Select_BillType_Mobile",
+  "events": "event1",
+  "__pv": false,
+  "pageName": "BillType"
+});
+  /* originalOnClick?.(e); */
+}}
 >
   ...
 </YourElement>
+```
+
+_Alternative wrapper (if preserving existing handler):_
+```js
+/* If the element uses a named handler like onClick={handleClick}, wrap it: */
+const _origHandleClick = typeof handleClick === 'function' ? handleClick : null;
+const handleClickTracked = (e) => {
+  track("select_bill_type", {
+  "eVar11": "Select_BillType_Mobile",
+  "events": "event1",
+  "__pv": false,
+  "pageName": "BillType"
+});
+  if (_origHandleClick) return _origHandleClick(e);
+};
+/* then use: onClick={handleClickTracked} */
 ```
 ## Page: EnterNumber
 ### KPI: [EnterNumber] Page view recorded when EnterNumber page loads
 - **Action**: `view`
 - **Adobe**: var=`eVar30`, value=`PageView_EnterNumber`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/EnterNumber.js:4`  (confidence 0.85)
-- **Why here**: The EnterNumber component is responsible for rendering the EnterNumber page, making it the appropriate location to track page views.
+- **Why here**: The EnterNumber component is the main page that will trigger the page view event upon loading.
 - **Event**: `pageView`
 - **Params:**
 ```json
@@ -165,8 +195,8 @@ onClick={() => { track('select_bill_type', { eVar11: 'Select_BillType_Mobile', e
   "eVar30": "PageView_EnterNumber"
 }
 ```
-- **Implementation**: Add tracking on component mount to capture the page view.
-- **Risks**: Tracking may not fire if component unmounts unexpectedly, Ensure track function is correctly implemented
+- **Implementation**: Add a useEffect hook to track the page view when the component mounts.
+- **Risks**: Ensure track function is correctly implemented, Check for potential duplicate page view tracking
 
 ```jsx
    1: import React, {useState} from 'react';
@@ -202,6 +232,7 @@ useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_EnterNumbe
 ```json
 {
   "eVar31": "Back_EnterNumber",
+  "events": "event1",
   "__pv": false,
   "pageName": "EnterNumber"
 }
@@ -230,7 +261,7 @@ useEffect(() => { track('pageView', { __pv: true, pageName: 'PageView_EnterNumbe
 _JSX attributes (apply to the element):_
 ```jsx
 <YourElement
-onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber' }); nav(-1); }}
+onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber', events: 'event1' }); nav(-1); }}
 >
   ...
 </YourElement>
@@ -250,8 +281,8 @@ onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber' }); n
   "pageName": "EnterNumber"
 }
 ```
-- **Implementation**: Track the click event on the Exit button to capture user interaction.
-- **Risks**: Event may not fire if the button is not clicked, User may navigate away before the event is tracked
+- **Implementation**: Track the exit link click to measure user engagement with the exit functionality.
+- **Risks**: User may not click the exit link, Tracking may not capture all exit scenarios
 
 ```jsx
    4: export default function EnterNumber(){
@@ -273,7 +304,7 @@ onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber' }); n
 
 _Imports (add once per file if missing):_
 ```js
-import { track } from "@/analytics/track.js";
+import { track } from "../analytics/track.js";
 ```
 
 _JSX attributes (apply to the element):_
@@ -315,17 +346,17 @@ const handleClickTracked = (e) => {
 - **Adobe**: var=`eVar20`, value=`PageView_Help`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/BillType.js:7`  (confidence 0.85)
 - **Why here**: The Help page view is relevant to the BillType component as it includes navigation to the Help page.
-- **Event**: `Help Page View`
+- **Event**: `pageView`
 - **Params:**
 ```json
 {
-  "eVar20": "PageView_Help",
   "__pv": true,
-  "pageName": "Help"
+  "pageName": "Help",
+  "eVar20": "PageView_Help"
 }
 ```
-- **Implementation**: Track the page view when the Help page is loaded.
-- **Risks**: Page view may not trigger if navigation is not handled correctly, Potential for duplicate tracking if not managed
+- **Implementation**: Add a useEffect hook to track the page view when the component mounts.
+- **Risks**: Potential for duplicate tracking if not managed correctly, User may navigate away before tracking occurs
 
 ```jsx
    1: import React from 'react';
@@ -352,13 +383,13 @@ import { useEffect } from 'react';
 
 _Hook (page view):_
 ```jsx
-useEffect(() => { track('Help Page View', { eVar20: 'PageView_Help', __pv: true, pageName: 'Help' }); }, []);
+useEffect(() => { track('pageView', { __pv: true, pageName: 'Help', eVar20: 'PageView_Help' }); }, []);
 ```
 ### KPI: [Help] Utilization of 'Español' link
 - **Action**: `nav`
 - **Adobe**: var=`eVar22`, value=`Nav_Espanol`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/Help.js:6`  (confidence 0.85)
-- **Why here**: The link for 'Español' is present in the Help page, making it the appropriate location for tracking this navigation event.
+- **Why here**: The link for 'Español' is present in the Help page, making it the appropriate location for tracking navigation.
 - **Event**: `nav`
 - **Params:**
 ```json
@@ -368,7 +399,7 @@ useEffect(() => { track('Help Page View', { eVar20: 'PageView_Help', __pv: true,
   "pageName": "Help"
 }
 ```
-- **Implementation**: Track the click event on the 'Español' link to capture navigation to the Spanish version.
+- **Implementation**: Track the click event on the 'Español' link to capture navigation.
 - **Risks**: Link may not be clicked frequently, Potential for missing tracking if not implemented correctly
 
 ```jsx
@@ -394,6 +425,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 ```
 
+_Hook (page view):_
+```jsx
+useEffect(() => { track('nav', { __pv: true, pageName: 'Help' }); }, []);
+```
+
 _JSX attributes (apply to the element):_
 ```jsx
 <YourElement
@@ -405,13 +441,13 @@ onClick={() => track('nav', { eVar22: 'Nav_Espanol', __pv: true, pageName: 'Help
 
 _Alternative wrapper (if preserving existing handler):_
 ```js
-onClick={altHandler => { altHandler(); track('nav', { eVar22: 'Nav_Espanol', __pv: true, pageName: 'Help' }); }}
+onClick={handleClick}
 ```
 ### KPI: [Help] Utilization of 'Pay your bill' button
 - **Action**: `click`
 - **Adobe**: var=`eVar21`, value=`CTA_PayYourBill`
 - **Suggested Location**: `/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js/src/pages/Help.js:9`  (confidence 0.85)
-- **Why here**: The click event handler for the 'Pay your bill' button is located in the Help.js file.
+- **Why here**: The event handler for the 'Pay your bill' button is located in the Help.js file, making it the appropriate place to implement the tracking.
 - **Event**: `PayYourBill_Click`
 - **Params:**
 ```json
@@ -421,7 +457,7 @@ onClick={altHandler => { altHandler(); track('nav', { eVar22: 'Nav_Espanol', __p
 }
 ```
 - **Implementation**: Track the click event on the 'Pay your bill' button to capture user interaction.
-- **Risks**: Event tracking may not fire if the button is not clicked., Potential for duplicate events if not properly managed.
+- **Risks**: Event tracking may not fire if the button is not clicked., Potential for duplicate events if the click handler is not properly managed.
 
 ```jsx
    3: export default function Help(){
@@ -458,12 +494,11 @@ onClick={() => { track('PayYourBill_Click', { eVar21: 'CTA_PayYourBill' }); nav(
 ```json
 {
   "eVar23": "Nav_Reviews",
-  "__pv": false,
   "pageName": "Help"
 }
 ```
 - **Implementation**: Track the click event on the 'Reviews' link to capture navigation data.
-- **Risks**: Link may not be accessible if the href is not properly set, User may navigate away before tracking is completed
+- **Risks**: Link may not be clickable if not properly rendered, Potential for missing tracking if event handler is not attached
 
 ```jsx
    1: import React from 'react';

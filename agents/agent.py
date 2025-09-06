@@ -80,7 +80,7 @@ def _fallback_track_helper():
 def _fallback_click_code(event_name: str, params: Dict[str, Any], analytics_id: str) -> Dict[str, str]:
     # Ensure import path is JS:
     return {
-        "imports": 'import { track } from "@/analytics/track.js";',
+        "imports": 'import { track } from "../analytics/track.js";',
         "jsx_attrs": (
             f'data-analytics-id="{analytics_id}"\n'
             "onClick={(e) => {\n"
@@ -105,7 +105,7 @@ def _fallback_view_code(event_name: str, params: Dict[str, Any]) -> Dict[str, st
     if "__pv" not in params:
         params = {**params, "__pv": True}
     return {
-        "imports": "import { useEffect } from 'react';\nimport { track } from '@/analytics/track.js';",
+        "imports": "import { useEffect } from 'react';\nimport { track } from '../analytics/track.js';",
         "hook": (
             "useEffect(() => {\n"
             f"  track(\"{event_name}\", {json.dumps(params, indent=2)});\n"
@@ -248,7 +248,7 @@ def build_unified(
                # normalize import path if needed (ts -> js), optional
                for k in ("imports", "alt_handler_wrap", "hook", "jsx_attrs"):
                    if isinstance(row["code"].get(k), str):
-                      row["code"][k] = row["code"][k].replace("@/analytics/track.ts", "@/analytics/track.js")
+                      row["code"][k] = row["code"][k].replace("../analytics/track.ts", "../analytics/track.js")
             else:
                 analytics_id = _slug(item.get("adobe_value") or item.get("description") or "ui_element")[:64]
 

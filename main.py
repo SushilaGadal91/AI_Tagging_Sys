@@ -56,7 +56,7 @@ def main():
     excel_candidates = [
         os.getenv("TECHSPEC_PATH"),
         "TechSpec_Tagging.xlsx",
-        "HelpPage_TechSpec.xlsx",
+        # "techspec.xlsx",
     ]
     excel = next((p for p in excel_candidates if p and Path(p).exists()), None)
     if not excel:

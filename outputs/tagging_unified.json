@@ -1,5 +1,5 @@
 {
-  "run_id": "2025-08-31T17:20:01",
+  "run_id": "2025-09-05T14:55:13",
   "excel": "/mnt/c/Users/sgadal/AppSelector/agentic_tagging_system/TechSpec_Tagging.xlsx",
   "repo": "/mnt/c/Users/sgadal/AppSelector/react-kiosk-billing-js",
   "items": [
@@ -29,20 +29,20 @@
       },
       "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function BillType(){\n   4:   const nav=useNavigate();\n   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">\n  10:       <div className=\"tile big\" onClick={()=>pick('Mobile')}><span>Mobile</span></div>\n  11:       <div className=\"tile big\" onClick={()=>pick('Home Internet')}><span>Home Internet</span></div>\n  12:     </div></div></div>);\n  13: }",
       "why_location": "The Help page view is relevant to the BillType component as it includes navigation to the Help page.",
-      "suggested_event_name": "Help Page View",
+      "suggested_event_name": "pageView",
       "suggested_params": {
-        "eVar20": "PageView_Help",
         "__pv": true,
-        "pageName": "Help"
+        "pageName": "Help",
+        "eVar20": "PageView_Help"
       },
-      "implementation_note": "Track the page view when the Help page is loaded.",
+      "implementation_note": "Add a useEffect hook to track the page view when the component mounts.",
       "risks": [
-        "Page view may not trigger if navigation is not handled correctly",
-        "Potential for duplicate tracking if not managed"
+        "Potential for duplicate tracking if not managed correctly",
+        "User may navigate away before tracking occurs"
       ],
       "code": {
         "imports": "import { useEffect } from 'react';",
-        "hook": "useEffect(() => { track('Help Page View', { eVar20: 'PageView_Help', __pv: true, pageName: 'Help' }); }, []);"
+        "hook": "useEffect(() => { track('pageView', { __pv: true, pageName: 'Help', eVar20: 'PageView_Help' }); }, []);"
       },
       "suggested_code_changes": ""
     },
@@ -70,7 +70,7 @@
         ]
       },
       "snippet": "   3: export default function Help(){\n   4:   const nav=useNavigate();\n   5:   return(<div className=\"screen\"><div className=\"page\">\n   6:     <div className=\"toolbar\"><div className=\"pill\">Today ▾</div><div className=\"spacer\"/><a className=\"link ghost\" href=\"#\">Español</a><a className=\"link ghost\" href=\"#\">Reviews</a></div>\n   7:     <h1 className=\"hero red\">How can we help you today?</h1>\n   8:     <div className=\"grid-2\">\n   9:       <div className=\"card action\" onClick={()=>nav('/bill-type')}><h3>Pay your bill</h3><p>Make a one-time payment toward your mobile or home internet bill.</p><div className=\"chev\">→</div></div>\n  10:       <div className=\"card\"><h3>Complete your order</h3><p>Access your order to proceed with payment.</p><div className=\"chev\">→</div></div>\n  11:       <div className=\"card\"><h3>Scan &amp; Go</h3><p>Scan the barcode to complete your accessory purchase.</p><div className=\"chev\">→</div></div>\n  12:       <div className=\"card ghost\"><h3>More options</h3><p>Coming soon.</p></div>\n  13:     </div></div></div>);\n  14: }",
-      "why_location": "The click event handler for the 'Pay your bill' button is located in the Help.js file.",
+      "why_location": "The event handler for the 'Pay your bill' button is located in the Help.js file, making it the appropriate place to implement the tracking.",
       "suggested_event_name": "PayYourBill_Click",
       "suggested_params": {
         "eVar21": "CTA_PayYourBill",
@@ -79,7 +79,7 @@
       "implementation_note": "Track the click event on the 'Pay your bill' button to capture user interaction.",
       "risks": [
         "Event tracking may not fire if the button is not clicked.",
-        "Potential for duplicate events if not properly managed."
+        "Potential for duplicate events if the click handler is not properly managed."
       ],
       "code": {
         "jsx_attrs": "onClick={() => { track('PayYourBill_Click', { eVar21: 'CTA_PayYourBill' }); nav('/bill-type'); }}"
@@ -110,14 +110,14 @@
         ]
       },
       "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function Help(){\n   4:   const nav=useNavigate();\n   5:   return(<div className=\"screen\"><div className=\"page\">\n   6:     <div className=\"toolbar\"><div className=\"pill\">Today ▾</div><div className=\"spacer\"/><a className=\"link ghost\" href=\"#\">Español</a><a className=\"link ghost\" href=\"#\">Reviews</a></div>\n   7:     <h1 className=\"hero red\">How can we help you today?</h1>\n   8:     <div className=\"grid-2\">\n   9:       <div className=\"card action\" onClick={()=>nav('/bill-type')}><h3>Pay your bill</h3><p>Make a one-time payment toward your mobile or home internet bill.</p><div className=\"chev\">→</div></div>\n  10:       <div className=\"card\"><h3>Complete your order</h3><p>Access your order to proceed with payment.</p><div className=\"chev\">→</div></div>\n  11:       <div className=\"card\"><h3>Scan &amp; Go</h3><p>Scan the barcode to complete your accessory purchase.</p><div className=\"chev\">→</div></div>\n  12:       <div className=\"card ghost\"><h3>More options</h3><p>Coming soon.</p></div>",
-      "why_location": "The link for 'Español' is present in the Help page, making it the appropriate location for tracking this navigation event.",
+      "why_location": "The link for 'Español' is present in the Help page, making it the appropriate location for tracking navigation.",
       "suggested_event_name": "nav",
       "suggested_params": {
         "eVar22": "Nav_Espanol",
         "__pv": true,
         "pageName": "Help"
       },
-      "implementation_note": "Track the click event on the 'Español' link to capture navigation to the Spanish version.",
+      "implementation_note": "Track the click event on the 'Español' link to capture navigation.",
       "risks": [
         "Link may not be clicked frequently",
         "Potential for missing tracking if not implemented correctly"
@@ -125,7 +125,8 @@
       "code": {
         "imports": "import React from 'react';\nimport { useNavigate } from 'react-router-dom';",
         "jsx_attrs": "onClick={() => track('nav', { eVar22: 'Nav_Espanol', __pv: true, pageName: 'Help' })}",
-        "alt_handler_wrap": "onClick={altHandler => { altHandler(); track('nav', { eVar22: 'Nav_Espanol', __pv: true, pageName: 'Help' }); }}"
+        "alt_handler_wrap": "onClick={handleClick}",
+        "hook": "useEffect(() => { track('nav', { __pv: true, pageName: 'Help' }); }, []);"
       },
       "suggested_code_changes": ""
     },
@@ -157,13 +158,12 @@
       "suggested_event_name": "nav",
       "suggested_params": {
         "eVar23": "Nav_Reviews",
-        "__pv": false,
         "pageName": "Help"
       },
       "implementation_note": "Track the click event on the 'Reviews' link to capture navigation data.",
       "risks": [
-        "Link may not be accessible if the href is not properly set",
-        "User may navigate away before tracking is completed"
+        "Link may not be clickable if not properly rendered",
+        "Potential for missing tracking if event handler is not attached"
       ],
       "code": {
         "imports": "import { track } from '../analytics';",
@@ -196,17 +196,17 @@
         ]
       },
       "snippet": "   1: import React from 'react';\n   2: import { useNavigate } from 'react-router-dom';\n   3: export default function BillType(){\n   4:   const nav=useNavigate();\n   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">",
-      "why_location": "The page view should be tracked when the BillType component is rendered.",
+      "why_location": "The BillType component is responsible for rendering the BillType page, making it the appropriate location to track page views.",
       "suggested_event_name": "pageView",
       "suggested_params": {
         "__pv": true,
         "pageName": "PageView_BillType",
         "eVar10": "PageView_BillType"
       },
-      "implementation_note": "Add tracking in a useEffect hook to capture the page view on component mount.",
+      "implementation_note": "Ensure that the track function is called when the component mounts to capture the page view.",
       "risks": [
-        "Tracking may not fire if component unmounts quickly",
-        "Potential for duplicate tracking if not managed correctly"
+        "Potential for duplicate tracking if not managed correctly",
+        "May not capture if the component is not mounted properly"
       ],
       "code": {
         "imports": "import { useEffect } from 'react';",
@@ -238,7 +238,7 @@
         ]
       },
       "snippet": "   4:   const nav=useNavigate();\n   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">\n  10:       <div className=\"tile big\" onClick={()=>pick('Mobile')}><span>Mobile</span></div>\n  11:       <div className=\"tile big\" onClick={()=>pick('Home Internet')}><span>Home Internet</span></div>\n  12:     </div></div></div>);\n  13: }",
-      "why_location": "The code contains a clickable JSX element for the 'Mobile' option, which is relevant for tracking the selection action.",
+      "why_location": "The code contains a clickable JSX element for the 'Mobile' option, making it suitable for tracking the selection action.",
       "suggested_event_name": "select_bill_type",
       "suggested_params": {
         "eVar11": "Select_BillType_Mobile",
@@ -246,13 +246,15 @@
         "__pv": false,
         "pageName": "BillType"
       },
-      "implementation_note": "Track the selection of the 'Mobile' bill type option when clicked.",
+      "implementation_note": "Track the selection of the 'Mobile' bill type option.",
       "risks": [
-        "Event may not fire if the click handler is not properly set up.",
-        "Potential for duplicate events if not managed correctly."
+        "Event may not fire if navigation fails",
+        "User may not click the option"
       ],
       "code": {
-        "jsx_attrs": "onClick={() => { track('select_bill_type', { eVar11: 'Select_BillType_Mobile', events: 'event1' }); pick('Mobile'); }}"
+        "imports": "import { track } from \"../analytics/track.js\";",
+        "jsx_attrs": "data-analytics-id=\"select_billtype_mobile\"\nonClick={(e) => {\n  track(\"select_bill_type\", {\n  \"eVar11\": \"Select_BillType_Mobile\",\n  \"events\": \"event1\",\n  \"__pv\": false,\n  \"pageName\": \"BillType\"\n});\n  /* originalOnClick?.(e); */\n}}",
+        "alt_handler_wrap": "/* If the element uses a named handler like onClick={handleClick}, wrap it: */\nconst _origHandleClick = typeof handleClick === 'function' ? handleClick : null;\nconst handleClickTracked = (e) => {\n  track(\"select_bill_type\", {\n  \"eVar11\": \"Select_BillType_Mobile\",\n  \"events\": \"event1\",\n  \"__pv\": false,\n  \"pageName\": \"BillType\"\n});\n  if (_origHandleClick) return _origHandleClick(e);\n};\n/* then use: onClick={handleClickTracked} */"
       },
       "suggested_code_changes": ""
     },
@@ -280,21 +282,21 @@
         ]
       },
       "snippet": "   5:   const pick=(type)=>nav('/enter-number',{state:{billType:type}});\n   6:   return(<div className=\"screen\"><div className=\"page\">\n   7:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>\n   8:     <h1 className=\"hero\">What type of bill do you want to pay?</h1>\n   9:     <div className=\"grid-2 compact\">\n  10:       <div className=\"tile big\" onClick={()=>pick('Mobile')}><span>Mobile</span></div>\n  11:       <div className=\"tile big\" onClick={()=>pick('Home Internet')}><span>Home Internet</span></div>\n  12:     </div></div></div>);\n  13: }",
-      "why_location": "The code contains an onClick event for the 'Home Internet' option, making it the appropriate location for tracking this action.",
-      "suggested_event_name": "select_bill_type",
+      "why_location": "The event handler for selecting the 'Home Internet' option is located in the BillType component.",
+      "suggested_event_name": "selectBillType",
       "suggested_params": {
         "eVar12": "Select_BillType_HomeInternet",
         "pageName": "BillType"
       },
-      "implementation_note": "Track the selection of the 'Home Internet' bill type option.",
+      "implementation_note": "Track the selection of the 'Home Internet' option when the corresponding tile is clicked.",
       "risks": [
-        "Event may not fire if the onClick is not triggered",
-        "Incorrect eVar value if not set properly"
+        "Event may not fire if the click handler is not correctly implemented.",
+        "Potential for duplicate events if not properly managed."
       ],
       "code": {
-        "imports": "import { track } from \"@/analytics/track.js\";",
-        "jsx_attrs": "data-analytics-id=\"select_billtype_homeinternet\"\nonClick={(e) => {\n  track(\"select_bill_type\", {\n  \"eVar12\": \"Select_BillType_HomeInternet\",\n  \"pageName\": \"BillType\"\n});\n  /* originalOnClick?.(e); */\n}}",
-        "alt_handler_wrap": "/* If the element uses a named handler like onClick={handleClick}, wrap it: */\nconst _origHandleClick = typeof handleClick === 'function' ? handleClick : null;\nconst handleClickTracked = (e) => {\n  track(\"select_bill_type\", {\n  \"eVar12\": \"Select_BillType_HomeInternet\",\n  \"pageName\": \"BillType\"\n});\n  if (_origHandleClick) return _origHandleClick(e);\n};\n/* then use: onClick={handleClickTracked} */"
+        "imports": "import { track } from \"../analytics/track.js\";",
+        "jsx_attrs": "data-analytics-id=\"select_billtype_homeinternet\"\nonClick={(e) => {\n  track(\"selectBillType\", {\n  \"eVar12\": \"Select_BillType_HomeInternet\",\n  \"pageName\": \"BillType\"\n});\n  /* originalOnClick?.(e); */\n}}",
+        "alt_handler_wrap": "/* If the element uses a named handler like onClick={handleClick}, wrap it: */\nconst _origHandleClick = typeof handleClick === 'function' ? handleClick : null;\nconst handleClickTracked = (e) => {\n  track(\"selectBillType\", {\n  \"eVar12\": \"Select_BillType_HomeInternet\",\n  \"pageName\": \"BillType\"\n});\n  if (_origHandleClick) return _origHandleClick(e);\n};\n/* then use: onClick={handleClickTracked} */"
       },
       "suggested_code_changes": ""
     },
@@ -323,17 +325,17 @@
         ]
       },
       "snippet": "   1: import React, {useState} from 'react';\n   2: import { useLocation, useNavigate } from 'react-router-dom';\n   3: import Keypad from '../components/Keypad.js';\n   4: export default function EnterNumber(){\n   5:   const nav=useNavigate(); const {state}=useLocation(); const billType=state?.billType||'Mobile';\n   6:   const [value,setValue]=useState(''); const maxLen=billType==='Mobile'?10:12;\n   7:   const onKey=(k)=>{ if(k==='Clear') return setValue(''); if(k==='⌫') return setValue(v=>v.slice(0,-1)); if(/^\\d$/.test(k)) setValue(v=>(v+k).slice(0,maxLen)); };\n   8:   const onSubmit=(e)=>{ e.preventDefault(); if(value.length<Math.min(6,maxLen)) return; alert(`Mock submit for ${billType}: ${value}`); };\n   9:   return(<div className=\"screen\"><div className=\"page\">\n  10:     <div className=\"toolbar\"><button className=\"link\" onClick={()=>nav(-1)}>← Back</button><div className=\"spacer\"/><button className=\"link\" onClick={()=>nav('/help')}>Exit</button></div>",
-      "why_location": "The EnterNumber component is responsible for rendering the EnterNumber page, making it the appropriate location to track page views.",
+      "why_location": "The EnterNumber component is the main page that will trigger the page view event upon loading.",
       "suggested_event_name": "pageView",
       "suggested_params": {
         "__pv": true,
         "pageName": "PageView_EnterNumber",
         "eVar30": "PageView_EnterNumber"
       },
-      "implementation_note": "Add tracking on component mount to capture the page view.",
+      "implementation_note": "Add a useEffect hook to track the page view when the component mounts.",
       "risks": [
-        "Tracking may not fire if component unmounts unexpectedly",
-        "Ensure track function is correctly implemented"
+        "Ensure track function is correctly implemented",
+        "Check for potential duplicate page view tracking"
       ],
       "code": {
         "imports": "import { useEffect } from 'react';",
@@ -369,6 +371,7 @@
       "suggested_event_name": "Back Button Clicked",
       "suggested_params": {
         "eVar31": "Back_EnterNumber",
+        "events": "event1",
         "__pv": false,
         "pageName": "EnterNumber"
       },
@@ -378,7 +381,7 @@
         "User may navigate away before tracking occurs"
       ],
       "code": {
-        "jsx_attrs": "onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber' }); nav(-1); }}"
+        "jsx_attrs": "onClick={() => { track('Back Button Clicked', { eVar31: 'Back_EnterNumber', events: 'event1' }); nav(-1); }}"
       },
       "suggested_code_changes": ""
     },
@@ -414,13 +417,13 @@
         "__pv": false,
         "pageName": "EnterNumber"
       },
-      "implementation_note": "Track the click event on the Exit button to capture user interaction.",
+      "implementation_note": "Track the exit link click to measure user engagement with the exit functionality.",
       "risks": [
-        "Event may not fire if the button is not clicked",
-        "User may navigate away before the event is tracked"
+        "User may not click the exit link",
+        "Tracking may not capture all exit scenarios"
       ],
       "code": {
-        "imports": "import { track } from \"@/analytics/track.js\";",
+        "imports": "import { track } from \"../analytics/track.js\";",
         "jsx_attrs": "data-analytics-id=\"exit_enternumber\"\nonClick={(e) => {\n  track(\"exit_link_click\", {\n  \"eVar32\": \"Exit_EnterNumber\",\n  \"events\": \"event1\",\n  \"__pv\": false,\n  \"pageName\": \"EnterNumber\"\n});\n  /* originalOnClick?.(e); */\n}}",
         "alt_handler_wrap": "/* If the element uses a named handler like onClick={handleClick}, wrap it: */\nconst _origHandleClick = typeof handleClick === 'function' ? handleClick : null;\nconst handleClickTracked = (e) => {\n  track(\"exit_link_click\", {\n  \"eVar32\": \"Exit_EnterNumber\",\n  \"events\": \"event1\",\n  \"__pv\": false,\n  \"pageName\": \"EnterNumber\"\n});\n  if (_origHandleClick) return _origHandleClick(e);\n};\n/* then use: onClick={handleClickTracked} */"
       },
