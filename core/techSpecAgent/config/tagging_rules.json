@@ -6,13 +6,24 @@
     "generic": "{action}_{object}"
   },
   "dictionary": {
-    "bill": "Bill",
+    "pay your bill": "PayYourBill",
+    "complete your order": "CompleteYourOrder",
+    "scan & go": "ScanAndGo",
+    "more options": "MoreOptions",
+    "today": "Today",
+    "expand": "Expand",
+    "reviews": "Reviews",
+    "back": "Back",
+    "exit": "Exit",
+    "what type of bill do you want to pay": "WhatTypeOfBillDoYouWantToPay",
     "mobile": "Mobile",
     "home internet": "HomeInternet",
-    "account entry": "AccountEntry",
-    "identifier": "Identifier",
-    "pay bill": "PayBill",
-    "category": "Category"
+    "enter your mobile number or account number": "EnterYourMobileNumberOrAccountNumber",
+    "mobile number or account number": "MobileNumberOrAccountNumber",
+    "continue": "Continue",
+    "enter your home internet number or account number": "EnterYourHomeInternetNumberOrAccountNumber",
+    "home internet number or account number": "HomeInternetNumberOrAccountNumber",
+    "clear": "Clear"
   },
   "action_aliases": {
     "select": "selection",

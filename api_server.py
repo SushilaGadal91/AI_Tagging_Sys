@@ -172,6 +172,27 @@ async def generate_techspec(request: TechSpecRequest):
     except Exception as e:
         logger.exception("generate_techspec error")
         raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+    
+
+# Add near your other constants if not already defined:
+# TECHSPEC_XLSX = CORE_DIR / "techSpecAgent/TechSpecOutputs/techspec.xlsx"
+
+@app.get("/techspec-file")
+async def get_techspec_file():
+    """Return the generated TechSpec Excel file."""
+    try:
+        require_file(TECHSPEC_XLSX, "TechSpec file not found. Please generate TechSpec first.")
+        return FileResponse(
+            path=str(TECHSPEC_XLSX),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename="techspec.xlsx",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("get_techspec_file error")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+
 
 @app.post("/suggest-tagging")
 async def suggest_tagging(request: SuggestTaggingRequest):
